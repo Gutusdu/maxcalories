@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111411">
+  <meta name="description" content="MAX Calories – Ernährung, Vorräte und Training an einem Ort.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <title>MAX Calories</title>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">M</span><div><strong>MAX <span>CALORIES</span></strong><small>YOUR PERSONAL COACH</small></div></div>
+    <button class="avatar" id="profileShortcut" aria-label="Profil öffnen">MAX</button>
+  </header>
+
+  <main id="app">
+    <section class="page active" id="page-dashboard">
+      <div class="eyebrow">DEIN TAG · <span id="todayLabel"></span></div>
+      <div class="headline-row"><div><h1>Auf Kurs,<br><em>Max.</em></h1><p class="muted">Kleine Schritte. Starke Ergebnisse.</p></div><div class="streak"><span>✦</span><b id="streakNum">1</b><small>TAGE DABEI</small></div></div>
+      <article class="card calorie-card">
+        <div class="card-head"><span>Kalorien heute</span><span class="pill" id="caloriePercent">0% erreicht</span></div>
+        <div class="calorie-main"><strong id="caloriesLeft">2.100</strong><span>kcal übrig</span></div>
+        <div class="progress"><span id="calorieBar"></span></div>
+        <div class="macro-grid">
+          <div><span class="macro-dot protein"></span><small>Protein</small><b><span id="proteinNow">0</span><i> / <span id="proteinGoal">200</span> g</i></b><div class="mini-progress"><span id="proteinBar"></span></div></div>
+          <div><span class="macro-dot carbs"></span><small>Kohlenhydrate</small><b><span id="carbsNow">0</span><i> / <span id="carbsGoal">220</span> g</i></b><div class="mini-progress"><span id="carbsBar"></span></div></div>
+          <div><span class="macro-dot fat"></span><small>Fett</small><b><span id="fatNow">0</span><i> / <span id="fatGoal">70</span> g</i></b><div class="mini-progress"><span id="fatBar"></span></div></div>
+        </div>
+      </article>
+      <div class="section-heading"><div><h2>Quick actions</h2><p class="muted">Was steht heute an?</p></div></div>
+      <div class="quick-grid">
+        <button class="quick-action" data-go="food"><span class="quick-icon">＋</span><b>Essen tracken</b><small>Mahlzeit hinzufügen</small></button>
+        <button class="quick-action" data-go="scan"><span class="quick-icon">▣</span><b>Etikett scannen</b><small>Nährwerte erkennen</small></button>
+        <button class="quick-action" data-go="pantry"><span class="quick-icon">⌂</span><b>Vorräte</b><small>Was ist zu Hause?</small></button>
+        <button class="quick-action" data-go="coach"><span class="quick-icon">✦</span><b>KI-Coach</b><small>Deine nächste Mahlzeit</small></button>
+      </div>
+      <div class="section-heading"><div><h2>Dein Essen</h2><p class="muted">Heute bisher</p></div><button class="text-button" data-go="food">+ Hinzufügen</button></div>
+      <div id="mealList" class="stack"></div>
+      <div class="section-heading"><div><h2>Dein Fokus</h2><p class="muted">Das bringt dich weiter</p></div></div>
+      <article class="card tip-card"><span class="tip-icon">✦</span><div><b>Protein über den Tag verteilen</b><p class="muted">Plane zu jeder Hauptmahlzeit eine Proteinquelle ein. So wird dein Tagesziel leichter erreichbar.</p></div></article>
+    </section>
+
+    <section class="page" id="page-food">
+      <div class="eyebrow">ERNÄHRUNG</div><h1>Was hast du<br><em>gegessen?</em></h1>
+      <p class="muted">Trage eine Mahlzeit ein und behalte deine Tageswerte im Blick.</p>
+      <article class="card">
+        <form id="foodForm" class="form-grid">
+          <label class="full">Lebensmittel / Gericht<input id="foodName" required placeholder="z. B. Proteinwrap mit Putenhack"></label>
+          <label>Menge (g/ml)<input id="foodAmount" type="number" min="1" value="100" required></label>
+          <label>Kalorien (kcal)<input id="foodCalories" type="number" min="0" required placeholder="z. B. 180"></label>
+          <label>Protein (g)<input id="foodProtein" type="number" min="0" step=".1" value="0"></label>
+          <label>Kohlenhydrate (g)<input id="foodCarbs" type="number" min="0" step=".1" value="0"></label>
+          <label>Fett (g)<input id="foodFat" type="number" min="0" step=".1" value="0"></label>
+          <label class="full">Mahlzeit<select id="foodMeal"><option>Frühstück</option><option>Mittagessen</option><option>Abendessen</option><option>Snack</option></select></label>
+          <button class="primary full" type="submit">+ Mahlzeit speichern</button>
+        </form>
+      </article>
+      <div class="section-heading"><div><h2>Heute protokolliert</h2><p class="muted">Tippe auf einen Eintrag, um ihn zu löschen.</p></div></div>
+      <div id="foodHistory" class="stack"></div>
+    </section>
+
+    <section class="page" id="page-scan">
+      <div class="eyebrow">SMART SCAN</div><h1>Etikett rein.<br><em>Werte raus.</em></h1>
+      <p class="muted">Fotografiere die Nährwerttabelle auf der Rückseite. Prüfe die erkannten Angaben vor dem Speichern.</p>
+      <article class="card">
+        <h2>Produkt per Barcode finden</h2>
+        <p class="muted">Sucht kostenlos in Open Food Facts. Die Datenbank deckt nicht jedes Produkt ab.</p>
+        <form id="barcodeForm" class="inline-form">
+          <input id="barcodeInput" inputmode="numeric" autocomplete="off" placeholder="EAN / Barcode eingeben" aria-label="EAN Barcode">
+          <button class="primary" type="submit">Suchen</button>
+        </form>
+        <button class="secondary full spaced" id="startBarcodeCamera" type="button">Kamera-Scanner starten</button>
+        <div id="barcodeStatus" class="scan-status">Du kannst den Barcode auch unter dem Strichcode eintippen.</div>
+        <video id="barcodeVideo" class="label-preview hidden" playsinline muted></video>
+        <button class="secondary full hidden" id="stopBarcodeCamera" type="button">Kamera stoppen</button>
+      </article>
+      <article class="card scan-card">
+        <div class="scan-visual"><span>▣</span><b>Nutrition Label Scanner</b><small>Foto oder Bild aus deiner Mediathek</small></div>
+        <label class="primary camera-button">Kamera öffnen / Foto wählen<input id="labelImage" type="file" accept="image/*" capture="environment"></label>
+        <div id="scanStatus" class="scan-status">Noch kein Etikett ausgewählt.</div>
+        <img id="labelPreview" class="label-preview hidden" alt="Vorschau des Nährwertetiketts">
+        <div class="notice">Die Texterkennung ist experimentell und lädt bei Bedarf die OCR-Bibliothek aus dem Internet. Zahlen können falsch erkannt werden – bitte immer mit der Verpackung abgleichen.</div>
+      </article>
+      <article class="card">
+        <h2>Ergebnis prüfen</h2>
+        <form id="scanForm" class="form-grid">
+          <label class="full">Produktname<input id="scanName" placeholder="z. B. Protein Pudding"></label>
+          <label>Bezugsmenge (g/ml)<input id="scanAmount" type="number" min="1" value="100"></label>
+          <label>Kalorien (kcal)<input id="scanCalories" type="number" min="0" placeholder="pro Bezugsmenge"></label>
+          <label>Protein (g)<input id="scanProtein" type="number" min="0" step=".1"></label>
+          <label>Kohlenhydrate (g)<input id="scanCarbs" type="number" min="0" step=".1"></label>
+          <label>Fett (g)<input id="scanFat" type="number" min="0" step=".1"></label>
+          <button class="primary full" type="submit">Werte übernehmen & tracken</button>
+        </form>
+      </article>
+    </section>
+
+    <section class="page" id="page-pantry">
+      <div class="eyebrow">DEINE KÜCHE</div><h1>Was ist<br><em>noch da?</em></h1>
+      <p class="muted">Deine Vorräte sind die Grundlage für passende Rezeptideen.</p>
+      <article class="card"><form id="pantryForm" class="inline-form"><input id="pantryName" required placeholder="z. B. Eier, Skyr, Wraps"><input id="pantryQty" placeholder="Menge (optional)"><button class="primary" type="submit">Hinzufügen</button></form></article>
+      <div class="section-heading"><div><h2>Deine Vorräte</h2><p class="muted">Antippen, wenn etwas aufgebraucht ist.</p></div><span class="pill" id="pantryCount">0 Artikel</span></div>
+      <div id="pantryList" class="pantry-grid"></div>
+      <article class="card soft-card"><h2>Fehlt dir etwas?</h2><p class="muted">Der Coach schlägt Rezepte zuerst mit deinen vorhandenen Zutaten vor.</p><button class="secondary full" data-go="coach">Rezepte aus meinen Vorräten</button></article>
+    </section>
+
+    <section class="page" id="page-coach">
+      <div class="eyebrow">MAX AI COACH · BETA</div><h1>Dein Ziel.<br><em>Dein Plan.</em></h1>
+      <p class="muted">Rezepte werden anhand deiner Vorräte, Vorlieben und verbleibenden Tageswerte vorgeschlagen.</p>
+      <article class="card coach-profile">
+        <div class="coach-orb">✦</div><div><b>Dein Ernährungs-Coach</b><p class="muted">Proteinreich · alltagstauglich · auf deine Küche abgestimmt</p></div>
+      </article>
+      <article class="card">
+        <h2>Was isst du gern?</h2>
+        <p class="muted small">Kommagetrennt eintragen, z. B. Wraps, Burger, Hähnchen, Pasta.</p>
+        <textarea id="likes" rows="2" placeholder="Deine Lieblingsgerichte ..."></textarea>
+        <h2 class="spaced">Was magst du gar nicht?</h2>
+        <textarea id="dislikes" rows="2" placeholder="z. B. Haferflocken, Pilze ..."></textarea>
+        <label class="checkbox-line"><input type="checkbox" id="highProtein"> Proteinreiche Gerichte bevorzugen</label>
+        <button class="primary full" id="savePrefs">Vorlieben speichern</button>
+      </article>
+      <div class="section-heading"><div><h2>Vorschläge für dich</h2><p class="muted">Basierend auf deinen Angaben</p></div></div>
+      <div id="recipeList" class="stack"></div>
+      <div class="notice">Beta: Die Rezeptvorschläge werden derzeit lokal aus Regeln und Beispielen erzeugt, nicht durch ein angebundenes Sprachmodell. Eine echte KI kann später ergänzt werden.</div>
+    </section>
+
+    <section class="page" id="page-body">
+      <div class="eyebrow">DEINE DATEN</div><h1>Dein Körper.<br><em>Dein Fortschritt.</em></h1>
+      <article class="card">
+        <h2>Körperprofil</h2><form id="bodyForm" class="form-grid">
+          <label>Größe (cm)<input id="height" type="number" min="80" max="250" value="190"></label>
+          <label>Aktuelles Gewicht (kg)<input id="weight" type="number" min="20" max="400" step=".1" value="112"></label>
+          <label>Zielgewicht (kg)<input id="goalWeight" type="number" min="20" max="400" step=".1" value="90"></label>
+          <label>Alter<input id="age" type="number" min="13" max="110" value="20"></label>
+          <label>Aktivitätslevel<select id="activity"><option value="1.2">Wenig aktiv</option><option value="1.375" selected>Leicht aktiv</option><option value="1.55">Moderat aktiv</option><option value="1.725">Sehr aktiv</option></select></label>
+          <label>Ziel<select id="goal"><option value="lose">Fett verlieren</option><option value="maintain">Gewicht halten</option><option value="gain">Muskeln aufbauen</option></select></label>
+          <label>Taillenumfang (cm)<input id="waist" type="number" min="20" max="250" step=".1" placeholder="Optional"></label>
+          <label>Kalorienziel (kcal)<input id="targetCalories" type="number" min="800" max="6000" value="2100"></label>
+          <label>Proteinziel (g)<input id="targetProtein" type="number" min="0" max="500" value="200"></label>
+          <label>Kohlenhydratziel (g)<input id="targetCarbs" type="number" min="0" max="800" value="220"></label>
+          <label>Fettziel (g)<input id="targetFat" type="number" min="0" max="300" value="70"></label>
+          <button class="primary full" type="submit">Profil speichern</button>
+        </form>
+        <div id="bodyInsight" class="insight"></div>
+      </article>
+      <article class="card"><h2>Gewichtsverlauf</h2><form id="weightForm" class="inline-form"><input id="newWeight" type="number" step=".1" min="20" max="400" placeholder="Gewicht kg" required><button class="secondary" type="submit">Eintragen</button></form><div id="weightHistory" class="weight-history"></div></article>
+    </section>
+
+    <section class="page" id="page-training">
+      <div class="eyebrow">BEWEGUNG</div><h1>Trainiere<br><em>mit Plan.</em></h1>
+      <p class="muted">Verwalte deine Workouts, Übungen und erledigten Einheiten.</p>
+      <article class="card"><h2>Workout hinzufügen</h2><form id="workoutForm" class="form-grid"><label class="full">Training<input id="workoutName" required placeholder="z. B. Ganzkörper A"></label><label>Übungen / Fokus<input id="workoutFocus" placeholder="z. B. Kniebeugen, Push-ups"></label><label>Dauer (Min.)<input id="workoutDuration" type="number" min="1" value="30"></label><button class="primary full" type="submit">Plan speichern</button></form></article>
+      <div class="section-heading"><div><h2>Dein Trainingsplan</h2><p class="muted">Ein Training als erledigt markieren.</p></div></div><div id="workoutList" class="stack"></div>
+      <article class="card soft-card"><h2>Trainingshinweis</h2><p class="muted">Starte mit einer Belastung, die du sauber kontrollieren kannst. Plane Erholung ein und steigere dich allmählich.</p></article>
+    </section>
+
+    <section class="page" id="page-supplements">
+      <div class="eyebrow">ROUTINE</div><h1>Deine<br><em>Supplements.</em></h1>
+      <article class="card"><form id="suppForm" class="form-grid"><label class="full">Produkt<input id="suppName" required placeholder="z. B. Kreatin Monohydrat"></label><label>Menge / Dosierung<input id="suppDose" placeholder="z. B. 5 g"></label><label>Einnahmezeit<select id="suppTime"><option>Morgens</option><option>Mittags</option><option>Abends</option><option>Vor dem Training</option><option>Nach dem Training</option></select></label><label class="full">Notiz (optional)<input id="suppNote" placeholder="z. B. mit Wasser"></label><button class="primary full" type="submit">Supplement hinzufügen</button></form></article>
+      <div class="section-heading"><div><h2>Deine Liste</h2><p class="muted">Abhaken, wenn erledigt.</p></div></div><div id="suppList" class="stack"></div>
+      <div class="notice">Die App ersetzt keine medizinische Beratung. Halte dich an Produktangaben und lass dich bei Unsicherheiten fachlich beraten.</div>
+    </section>
+
+    <section class="page" id="page-settings">
+      <div class="eyebrow">EINSTELLUNGEN</div><h1>Alles<br><em>deins.</em></h1>
+      <article class="card"><h2>Deine Tagesziele</h2><p class="muted">Du kannst deine Werte im Bereich Körper anpassen.</p><button class="secondary full" data-go="body">Körperprofil öffnen</button></article>
+      <article class="card"><h2>Daten & Privatsphäre</h2><p class="muted">Deine Daten werden in diesem Prototyp nur lokal in diesem Browser gespeichert. Beim Löschen der Browserdaten können sie verloren gehen.</p><button class="secondary full" id="exportData">Daten exportieren (JSON)</button><button class="danger full spaced" id="resetData">Alle lokalen Daten löschen</button></article>
+      <article class="card"><h2>Über MAX Calories</h2><p class="muted">Version 0.1 · PWA-Prototyp. Keine Konten, keine Cloud-Synchronisierung und noch keine echte KI-Anbindung.</p></article>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Hauptnavigation">
+    <button class="nav-item active" data-page="dashboard"><span>⌂</span><small>Heute</small></button>
+    <button class="nav-item" data-page="food"><span>＋</span><small>Essen</small></button>
+    <button class="nav-item" data-page="pantry"><span>▤</span><small>Vorräte</small></button>
+    <button class="nav-item" data-page="coach"><span>✦</span><small>Coach</small></button>
+    <button class="nav-item" data-page="body"><span>◉</span><small>Profil</small></button>
+    <button class="nav-item more-nav" id="moreButton"><span>•••</span><small>Mehr</small></button>
+  </nav>
+  <div id="moreMenu" class="more-menu hidden"><button data-go="training">Training</button><button data-go="supplements">Supplements</button><button data-go="settings">Einstellungen</button></div>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
